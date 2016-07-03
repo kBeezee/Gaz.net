@@ -1,6 +1,20 @@
-﻿
+﻿Imports System.ComponentModel
+
 Public Class MainWindow
     Public mp As New Marketplace
+    Public MarketReturnObject As New MarketResultsForMainWindow
+
+    Public Sub New()
+
+        ' This call is required by the designer.
+        InitializeComponent()
+
+        ' Add any initialization after the InitializeComponent() call.
+        MarketReturnObject.Money = 500.0
+        lblStatusBar.DataContext = MarketReturnObject
+        valMoney.DataContext = MarketReturnObject
+        MarketReturnObject.Status = "Welcome"
+    End Sub
 
     Public Class TravelWindowResults
         Private Shared strCity As String = ""
@@ -23,40 +37,11 @@ Public Class MainWindow
         End Property
     End Class
 
-    Public Class MarketResultsForMainWindow
-        Private Shared decMoney As Decimal = 500.0
-        Private Shared lngTotalCargo As Long = 0
-        Private Shared strStatus As String = 0
-        Public Shared Property Money() As Decimal
-            Get
-                Return decMoney
-            End Get
-            Set(value As Decimal)
-                decMoney = value
-            End Set
-        End Property
-        Public Shared Property TotalCargo() As Decimal
-            Get
-                Return lngTotalCargo
-            End Get
-            Set(value As Decimal)
-                lngTotalCargo = value
-            End Set
-        End Property
-        Public Shared Property Status() As String
-            Get
-                Return strStatus
-            End Get
-            Set(value As String)
-                strStatus = value
-            End Set
-        End Property
-    End Class
+
 
     Private Sub btnOpenTravelMenu_Click(sender As Object, e As RoutedEventArgs) Handles btnOpenTravelMenu.Click
         Dim newWindow As Window
         Dim TravelReturnValue As New TravelWindowResults
-
 
         newWindow = New Window1()
         Window1.CurrentLocation = valLocation.Content
@@ -66,15 +51,13 @@ Public Class MainWindow
 
         ElseIf TravelWindowResults.City <> valLocation.Content Then
             valLocation.Content = TravelWindowResults.City
-            MarketResultsForMainWindow.Money -= 10
+            MarketReturnObject.Money -= 10
             lvMarketplace.ItemsSource = Nothing
             lvMarketplace.ItemsSource = mp.GetCurrentMarketplace(TravelWindowResults.State)
 
         End If
 
-
         lvCargo.ItemsSource = mp.GetOwnedCommodities()
-
 
     End Sub
 
@@ -86,7 +69,6 @@ Public Class MainWindow
         'yay data binding, see XML for how this works. The XML has the properties of the class bound
         'to the column they are supposed to be in.  Cool!
         lvMarketplace.ItemsSource = mp.CurrentData
-        MarketResultsForMainWindow.Money = 500.0
     End Sub
 
     Private Sub tabChangeHandler() Handles tabMarketplace.GotFocus, tabCargo.GotFocus, gridMainWindow.Loaded
@@ -100,17 +82,19 @@ Public Class MainWindow
     End Sub
 
     Private Sub btnTradeHandled(sender As Object, e As RoutedEventArgs) Handles btnBuy.Click, btnSell.Click
-        Dim fullPrice As Long
+
         If MainWindow1.tabControl.SelectedItem.name = "tabMarketplace" Then
             'Buying
-            mp.Buy(lvMarketplace)
+            mp.Buy(lvMarketplace, Me)
         ElseIf MainWindow1.tabControl.SelectedItem.name = "tabCargo" Then
             'Selling
             'Things to Check: Enough Cargo, >0 val, <max cargo
-
+            mp.Sell(lvMarketplace, Me)
         End If
 
         'valMoney.Content = MainWindow.MarketResultsForMainWindow.Money
         lvCargo.ItemsSource = mp.GetOwnedCommodities()
+        'valMoney.DataContext = New MarketResultsForMainWindow
     End Sub
+
 End Class

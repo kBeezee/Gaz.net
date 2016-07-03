@@ -1,4 +1,6 @@
-﻿Public Class Marketplace
+﻿Imports System.ComponentModel
+
+Public Class Marketplace
     Private Shared arrCurrentData As List(Of Commodity)
     Private Shared arrStartingData As List(Of Commodity)
     Private Shared arrMyCargo As List(Of Commodity)
@@ -80,9 +82,8 @@
 
         Return output
     End Function
-    Public Function Buy(lvMarketplace As ListView) As Decimal
+    Public Sub Buy(lvMarketplace As ListView, mw1 As MainWindow)
         Dim decTotalTransactionPrice As Decimal, lngTotalTransactionCargo As Long, lngTotalCurrentnCargo As Long
-
         'Things to Check: Enough Money, Enough Cargo Area
         For Each n In CurrentData
             If n.QuantityOwned > 0 Then
@@ -94,10 +95,10 @@
             End If
         Next
 
-        If MainWindow.MarketResultsForMainWindow.Money < decTotalTransactionPrice Then
-
+        If mw1.MarketReturnObject.Money < decTotalTransactionPrice Then
+            mw1.MarketReturnObject.Status = "Not enough money."
+            Exit Sub
         End If
-
 
         'Once all checks are done, do this.
         For Each n In CurrentData
@@ -108,12 +109,46 @@
         Next
         lvMarketplace.ItemsSource = Nothing
         lvMarketplace.ItemsSource = Me.CurrentData
-        MainWindow.MarketResultsForMainWindow.Money -= decTotalTransactionPrice
-        MainWindow.MarketResultsForMainWindow.TotalCargo += lngTotalTransactionCargo
-        MainWindow.MarketResultsForMainWindow.Status = "All Good"
-        'And return how much it cost
-        Return lngTotalCurrentnCargo
-    End Function
+
+        mw1.MarketReturnObject.Money -= decTotalTransactionPrice
+        mw1.MarketReturnObject.TotalCargo += lngTotalTransactionCargo
+        mw1.MarketReturnObject.Status = "Spent " + decTotalTransactionPrice.ToString()
+    End Sub
+    Public Sub Sell(lvCargo As ListView, mw1 As MainWindow)
+        'Things to Check: Enough Cargo, >0 val, <max cargo
+        Dim decTotalSale As Decimal, lngTotalCargo As Long
+        For Each n In GetOwnedCommodities()
+            If n.QuantityOwned > 0 Then
+                If n.QuantitySelling > n.QuantityOwned Then
+                    mw1.MarketReturnObject.Status = "You only own " + n.QuantityOwned.ToString() + " " + n.Name
+                    Exit Sub
+                End If
+                If n.QuantitySelling < 0 Then
+                    mw1.MarketReturnObject.Status = "Cannot sell negative " + n.Name
+                    Exit Sub
+                End If
+                decTotalSale += n.QuantitySelling * n.Price
+                lngTotalCargo -= n.QuantitySelling
+            End If
+        Next
+
+        If decTotalSale > 0 Then
+            For Each n In GetOwnedCommodities()
+                If n.QuantitySelling > 0 Then
+                    n.QuantityOwned -= n.QuantitySelling
+                End If
+            Next
+        End If
+
+        lvCargo.ItemsSource = Nothing
+        lvCargo.ItemsSource = GetCurrentMarketplace("", False)
+        mw1.MarketReturnObject.Money += decTotalSale
+        mw1.MarketReturnObject.TotalCargo += lngTotalCargo
+        mw1.MarketReturnObject.Status = "Earned " + decTotalSale.ToString()
+
+
+
+    End Sub
 End Class
 
 Public Class Commodity
@@ -192,4 +227,43 @@ Public Class Commodity
         End Set
     End Property
 End Class
-'SpecialtyOf
+Public Class MarketResultsForMainWindow
+    Implements INotifyPropertyChanged
+    Private Shared decMoney As Decimal = 500.0
+    Private Shared lngTotalCargo As Long = 0
+    Private Shared strStatus As String = 0
+    Public Property Money() As Decimal
+        Get
+            Return decMoney
+        End Get
+        Set(value As Decimal)
+            decMoney = value
+            OnPropertyChanged(New PropertyChangedEventArgs("Money"))
+
+        End Set
+    End Property
+    Public Property TotalCargo() As Decimal
+        Get
+            Return lngTotalCargo
+        End Get
+        Set(value As Decimal)
+            lngTotalCargo = value
+        End Set
+    End Property
+    Public Property Status() As String
+        Get
+            Return strStatus
+        End Get
+        Set(value As String)
+            strStatus = value
+            OnPropertyChanged(New PropertyChangedEventArgs("Status"))
+        End Set
+    End Property
+    Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
+
+    Public Sub OnPropertyChanged(ByVal e As PropertyChangedEventArgs)
+        If Not PropertyChangedEvent Is Nothing Then
+            RaiseEvent PropertyChanged(Me, e)
+        End If
+    End Sub
+End Class
