@@ -1,5 +1,4 @@
 ﻿
-
 Public Class MainWindow
     Public mp As New Marketplace
 
@@ -24,6 +23,36 @@ Public Class MainWindow
         End Property
     End Class
 
+    Public Class MarketResultsForMainWindow
+        Private Shared decMoney As Decimal = 500.0
+        Private Shared lngTotalCargo As Long = 0
+        Private Shared strStatus As String = 0
+        Public Shared Property Money() As Decimal
+            Get
+                Return decMoney
+            End Get
+            Set(value As Decimal)
+                decMoney = value
+            End Set
+        End Property
+        Public Shared Property TotalCargo() As Decimal
+            Get
+                Return lngTotalCargo
+            End Get
+            Set(value As Decimal)
+                lngTotalCargo = value
+            End Set
+        End Property
+        Public Shared Property Status() As String
+            Get
+                Return strStatus
+            End Get
+            Set(value As String)
+                strStatus = value
+            End Set
+        End Property
+    End Class
+
     Private Sub btnOpenTravelMenu_Click(sender As Object, e As RoutedEventArgs) Handles btnOpenTravelMenu.Click
         Dim newWindow As Window
         Dim TravelReturnValue As New TravelWindowResults
@@ -34,25 +63,30 @@ Public Class MainWindow
         newWindow.ShowDialog()
 
         If TravelWindowResults.City = "Go Back" Then
-            'pass
+
         ElseIf TravelWindowResults.City <> valLocation.Content Then
             valLocation.Content = TravelWindowResults.City
-            mp.RefreshCurrentPrices(TravelWindowResults.State)
+            MarketResultsForMainWindow.Money -= 10
             lvMarketplace.ItemsSource = Nothing
-            lvMarketplace.ItemsSource = mp.CurrentData
+            lvMarketplace.ItemsSource = mp.GetCurrentMarketplace(TravelWindowResults.State)
+
         End If
+
+
+        lvCargo.ItemsSource = mp.GetOwnedCommodities()
+
 
     End Sub
 
     Private Sub MainWindow_Initialized(sender As Object, e As EventArgs) Handles Me.Initialized
         'First time load.
         mp.Init()
-        mp.RefreshCurrentPrices("MO")
+        mp.CurrentData = mp.GetCurrentMarketplace("MO")
 
         'yay data binding, see XML for how this works. The XML has the properties of the class bound
         'to the column they are supposed to be in.  Cool!
         lvMarketplace.ItemsSource = mp.CurrentData
-        lvCargo.ItemsSource = mp.Cargo
+        MarketResultsForMainWindow.Money = 500.0
     End Sub
 
     Private Sub tabChangeHandler() Handles tabMarketplace.GotFocus, tabCargo.GotFocus, gridMainWindow.Loaded
@@ -65,10 +99,18 @@ Public Class MainWindow
         End If
     End Sub
 
-    Private Sub btnBuy_Click(sender As Object, e As RoutedEventArgs) Handles btnBuy.Click
-        Dim tCom As New Commodity
-        Dim lng
-        tCom = MainWindow1.lvMarketplace.Items(MainWindow1.lvMarketplace.SelectedIndex)
+    Private Sub btnTradeHandled(sender As Object, e As RoutedEventArgs) Handles btnBuy.Click, btnSell.Click
+        Dim fullPrice As Long
+        If MainWindow1.tabControl.SelectedItem.name = "tabMarketplace" Then
+            'Buying
+            mp.Buy(lvMarketplace)
+        ElseIf MainWindow1.tabControl.SelectedItem.name = "tabCargo" Then
+            'Selling
+            'Things to Check: Enough Cargo, >0 val, <max cargo
 
+        End If
+
+        'valMoney.Content = MainWindow.MarketResultsForMainWindow.Money
+        lvCargo.ItemsSource = mp.GetOwnedCommodities()
     End Sub
 End Class

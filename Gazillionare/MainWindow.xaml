@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:Gazillionare"
         mc:Ignorable="d"
         Title="Gazillionare Remake" Height="352" Width="528" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+
     <Grid x:Name="gridMainWindow" Margin="0,0,-6,-3">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="5*"/>
@@ -15,7 +16,11 @@
         <Rectangle Grid.Column="1" Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="52" Margin="11,18,0,0" Stroke="Black" VerticalAlignment="Top" Width="165"/>
         <Label x:Name="lblLocation" Content="Location:" HorizontalAlignment="Left" Margin="11,18,0,0" VerticalAlignment="Top" Grid.Column="1"/>
         <Label x:Name="lblMoney" Content="Money: " HorizontalAlignment="Left" Margin="11,44,0,0" VerticalAlignment="Top" Grid.Column="1"/>
-        <Label x:Name="valMoney" Content="&lt;Value&gt;" HorizontalAlignment="Left" Margin="69,44,0,0" VerticalAlignment="Top" Grid.Column="1"/>
+        <Label x:Name="valMoney" Content="500.00" HorizontalAlignment="Left" Margin="69,44,0,0" VerticalAlignment="Top" Grid.Column="1">
+            <Label.BindingGroup>
+                <BindingGroup Name="MarketResultsForMainWindow.Money"/>
+            </Label.BindingGroup>
+        </Label>
         <Label x:Name="valLocation" Content="Springfield" HorizontalAlignment="Left" Margin="69,18,0,0" VerticalAlignment="Top" Grid.Column="1"/>
         <Grid Grid.Column="1" HorizontalAlignment="Left" Height="60" Margin="4,10,0,0" VerticalAlignment="Top" Width="172"/>
         <Button x:Name="btnOpenTravelMenu" Content="Travel" Grid.Column="1" HorizontalAlignment="Left" Margin="418,286,0,0" VerticalAlignment="Top" Width="75"/>
@@ -27,6 +32,13 @@
                             <GridView>
                                 <GridViewColumn Header="Commodity"  Width="Auto" DisplayMemberBinding="{Binding Name}"/>
                                 <GridViewColumn Header="Price" Width="Auto" DisplayMemberBinding="{Binding Price}"/>
+                                <GridViewColumn Header="Quantity" Width="Auto">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBox Text="{Binding QuantityOwned}"  Width="30"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
                             </GridView>
                         </ListView.View>
                     </ListView>
@@ -43,6 +55,13 @@
                             <GridView>
                                 <GridViewColumn Header="Commodity"  Width="Auto" DisplayMemberBinding="{Binding Name}"/>
                                 <GridViewColumn Header="Price" Width="Auto" DisplayMemberBinding="{Binding Price}"/>
+                                <GridViewColumn Header="Quantity" Width="Auto" >
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBox Text="{Binding QuantityBuying}" Width="30"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
                             </GridView>
                         </ListView.View>
                     </ListView>
@@ -51,6 +70,14 @@
         </TabControl>
         <Button x:Name="btnBuy" Content="Buy" Grid.Column="1" HorizontalAlignment="Left" Margin="418,205,0,0" VerticalAlignment="Top" Width="75" />
         <Button x:Name="btnSell" Content="Sell" Grid.Column="1" HorizontalAlignment="Left" Margin="200,205,0,0" VerticalAlignment="Top" Width="75" />
+        <Label x:Name="lblStatusBar" Content="" Grid.Column="1" HorizontalAlignment="Left" Margin="280,205,0,0" VerticalAlignment="Top" Width="133" Height="20" BorderThickness="0" FontSize="8">
+            <Label.BindingGroup>
+                <BindingGroup Name="" NotifyOnValidationError="True"/>
+            </Label.BindingGroup>
+            <Label.Effect>
+                <DropShadowEffect/>
+            </Label.Effect>
+        </Label>
 
     </Grid>
 </Window>
