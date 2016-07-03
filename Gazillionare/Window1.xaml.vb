@@ -1,8 +1,9 @@
 ﻿Imports System.ComponentModel
 
 Public Class Window1
-    Private Shared strCurrentLocation As String = ""
-    Public Shared Property CurrentLocation() As String
+    Private strCurrentLocation As String = ""
+    Private twr As New TravelWindowResults
+    Public Property CurrentCity() As String
         Get
             Return strCurrentLocation
         End Get
@@ -10,30 +11,25 @@ Public Class Window1
             strCurrentLocation = value
         End Set
     End Property
-
+    Public Function GetTravelWindowResults() As TravelWindowResults
+        Return twr
+    End Function
     Public Sub TravelHandler(sender As Button, e As RoutedEventArgs) Handles trav1.Click, trav2.Click, trav3.Click, trav4.Click,
             trav5.Click, trav6.Click, trav7.Click, trav8.Click, trav9.Click, btnGoBack.Click
 
         If sender.Content = "Go Back" Then
-            Window1.Close()
+            Me.Close()
+            Exit Sub
         End If
 
         'Stuff here should change our current location, as well as change the marketplace.
         'Manipulate the 'TravelWindowResults' class to add properties you need to change marketplace and other
-        MainWindow.TravelWindowResults.City = sender.Content
-        Select Case sender.Content
-            Case "Springfield", "Nixa", "Republic"
-                MainWindow.TravelWindowResults.State = "MO"
-            Case "Chantilly", "Reston", "Herndon"
-                MainWindow.TravelWindowResults.State = "VA"
-            Case "Lowell", "Chelmsford", "Billerica"
-                MainWindow.TravelWindowResults.State = "MA"
-        End Select
+        twr.City = sender.Content
+        twr.State = City2State(twr.City)
         Window1.Close()
     End Sub
 
     Private Sub gridTravel_Initialized(sender As Object, e As EventArgs) Handles gridTravel.Initialized
-        Dim i As Long
         Dim NinePlaces As New Dictionary(Of String, String)
 
         NinePlaces.Add("trav1", "Springfield")
@@ -56,11 +52,23 @@ Public Class Window1
     End Sub
     Private Sub Window1_Loaded(sender As Object, e As RoutedEventArgs) Handles Me.Loaded
         For Each n As Button In gridTravel.Children
-            If n.Content = Window1.CurrentLocation Then
+            If n.Content = Me.GetTravelWindowResults.City Then
                 n.IsEnabled = False
             Else
                 n.IsEnabled = True
             End If
         Next
     End Sub
+    Public Function City2State(strCity As String) As String
+        Select Case strCity
+            Case "Springfield", "Nixa", "Republic"
+                Return "MO"
+            Case "Chantilly", "Reston", "Herndon"
+                Return "VA"
+            Case "Lowell", "Chelmsford", "Billerica"
+                Return "MA"
+            Case Else
+                '
+        End Select
+    End Function
 End Class

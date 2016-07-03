@@ -18,10 +18,15 @@
         <Label x:Name="lblMoney" Content="Money: " HorizontalAlignment="Left" Margin="11,44,0,0" VerticalAlignment="Top" Grid.Column="1"/>
         <Label x:Name="valMoney" Content="{Binding Path=Money}" HorizontalAlignment="Left" Margin="69,44,0,0" VerticalAlignment="Top" Grid.Column="1">
             <Label.BindingGroup>
-                <BindingGroup Name="MarketResultsForMainWindow.Money"/>
+                <BindingGroup Name="MarketResultsForMainWindow"/>
             </Label.BindingGroup>
         </Label>
-        <Label x:Name="valLocation" Content="Springfield" HorizontalAlignment="Left" Margin="69,18,0,0" VerticalAlignment="Top" Grid.Column="1" />
+        <Label x:Name="valCity" Content="{Binding Path=City}" HorizontalAlignment="Left" Margin="69,18,0,0" VerticalAlignment="Top" Grid.Column="1" >
+        <Label.BindingGroup>
+                <BindingGroup Name="TravelWindowResults"/>
+        </Label.BindingGroup>
+        </Label>
+    
         <Grid Grid.Column="1" HorizontalAlignment="Left" Height="60" Margin="4,10,0,0" VerticalAlignment="Top" Width="172"/>
         <Button x:Name="btnOpenTravelMenu" Content="Travel" Grid.Column="1" HorizontalAlignment="Left" Margin="418,286,0,0" VerticalAlignment="Top" Width="75"/>
         <TabControl x:Name="tabControl" Grid.Column="1" HorizontalAlignment="Left" Height="182" Margin="200,18,0,0" VerticalAlignment="Top" Width="293">
@@ -71,7 +76,10 @@
         </TabControl>
         <Button x:Name="btnBuy" Content="Buy" Grid.Column="1" HorizontalAlignment="Left" Margin="418,205,0,0" VerticalAlignment="Top" Width="75" />
         <Button x:Name="btnSell" Content="Sell" Grid.Column="1" HorizontalAlignment="Left" Margin="200,205,0,0" VerticalAlignment="Top" Width="75" />
-        <Label x:Name="lblStatusBar" Content="{Binding Status}" Grid.Column="1" HorizontalAlignment="Left" Margin="280,205,0,0" VerticalAlignment="Top" Width="133" Height="25" BorderThickness="0" FontSize="10"/>
-
+        <Label x:Name="lblStatusBar" Content="{Binding Status}" Grid.Column="1" HorizontalAlignment="Left" Margin="280,205,0,0" VerticalAlignment="Top" Width="133" Height="25" BorderThickness="0" FontSize="10">
+        <Label.BindingGroup>
+            <BindingGroup Name="MarketResultsForMainWindow"/>
+        </Label.BindingGroup>
+        </Label>
     </Grid>
 </Window>

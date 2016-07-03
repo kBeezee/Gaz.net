@@ -145,9 +145,6 @@ Public Class Marketplace
         mw1.MarketReturnObject.Money += decTotalSale
         mw1.MarketReturnObject.TotalCargo += lngTotalCargo
         mw1.MarketReturnObject.Status = "Earned " + decTotalSale.ToString()
-
-
-
     End Sub
 End Class
 
@@ -227,6 +224,7 @@ Public Class Commodity
         End Set
     End Property
 End Class
+
 Public Class MarketResultsForMainWindow
     Implements INotifyPropertyChanged
     Private Shared decMoney As Decimal = 500.0
@@ -257,8 +255,40 @@ Public Class MarketResultsForMainWindow
         Set(value As String)
             strStatus = value
             OnPropertyChanged(New PropertyChangedEventArgs("Status"))
+
         End Set
     End Property
+    Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
+
+    Public Sub OnPropertyChanged(ByVal e As PropertyChangedEventArgs)
+        If Not PropertyChangedEvent Is Nothing Then
+            RaiseEvent PropertyChanged(Me, e)
+        End If
+    End Sub
+End Class
+
+Public Class TravelWindowResults
+    Implements INotifyPropertyChanged
+    Private Shared strCity As String = ""
+    Private Shared strState As String = ""
+    Public Property City() As String
+        Get
+            Return strCity
+        End Get
+        Set(value As String)
+            strCity = value
+            OnPropertyChanged(New PropertyChangedEventArgs("City"))
+        End Set
+    End Property
+    Public Property State() As String
+        Get
+            Return strState
+        End Get
+        Set(value As String)
+            strState = value
+        End Set
+    End Property
+
     Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
 
     Public Sub OnPropertyChanged(ByVal e As PropertyChangedEventArgs)

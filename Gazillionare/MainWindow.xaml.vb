@@ -3,58 +3,43 @@
 Public Class MainWindow
     Public mp As New Marketplace
     Public MarketReturnObject As New MarketResultsForMainWindow
+    Public twr As New TravelWindowResults
 
     Public Sub New()
 
         ' This call is required by the designer.
         InitializeComponent()
 
+
         ' Add any initialization after the InitializeComponent() call.
-        MarketReturnObject.Money = 500.0
+
         lblStatusBar.DataContext = MarketReturnObject
         valMoney.DataContext = MarketReturnObject
+        valCity.DataContext = twr
+
+        twr.City = "Springfield"
+        twr.State = "MO"
+        MarketReturnObject.Money = 500.0
         MarketReturnObject.Status = "Welcome"
+
     End Sub
 
-    Public Class TravelWindowResults
-        Private Shared strCity As String = ""
-        Private Shared strState As String = ""
-        Public Shared Property City() As String
-            Get
-                Return strCity
-            End Get
-            Set(value As String)
-                strCity = value
-            End Set
-        End Property
-        Public Shared Property State() As String
-            Get
-                Return strState
-            End Get
-            Set(value As String)
-                strState = value
-            End Set
-        End Property
-    End Class
-
-
-
     Private Sub btnOpenTravelMenu_Click(sender As Object, e As RoutedEventArgs) Handles btnOpenTravelMenu.Click
-        Dim newWindow As Window
-        Dim TravelReturnValue As New TravelWindowResults
+        Dim TravWindow As New Window1
 
-        newWindow = New Window1()
-        Window1.CurrentLocation = valLocation.Content
-        newWindow.ShowDialog()
+        TravWindow = New Window1()
+        TravWindow.CurrentCity = valCity.Content
 
-        If TravelWindowResults.City = "Go Back" Then
+        TravWindow.ShowDialog()
 
-        ElseIf TravelWindowResults.City <> valLocation.Content Then
-            valLocation.Content = TravelWindowResults.City
-            MarketReturnObject.Money -= 10
+        twr.City = TravWindow.GetTravelWindowResults().City
+
+        If twr.City = "Go Back" Then
+
+        ElseIf twr.City <> TravWindow.CurrentCity Then
+            MarketReturnObject.Money -= 5
             lvMarketplace.ItemsSource = Nothing
-            lvMarketplace.ItemsSource = mp.GetCurrentMarketplace(TravelWindowResults.State)
-
+            lvMarketplace.ItemsSource = mp.GetCurrentMarketplace(twr.State)
         End If
 
         lvCargo.ItemsSource = mp.GetOwnedCommodities()
@@ -84,17 +69,12 @@ Public Class MainWindow
     Private Sub btnTradeHandled(sender As Object, e As RoutedEventArgs) Handles btnBuy.Click, btnSell.Click
 
         If MainWindow1.tabControl.SelectedItem.name = "tabMarketplace" Then
-            'Buying
             mp.Buy(lvMarketplace, Me)
         ElseIf MainWindow1.tabControl.SelectedItem.name = "tabCargo" Then
-            'Selling
-            'Things to Check: Enough Cargo, >0 val, <max cargo
             mp.Sell(lvMarketplace, Me)
         End If
 
-        'valMoney.Content = MainWindow.MarketResultsForMainWindow.Money
         lvCargo.ItemsSource = mp.GetOwnedCommodities()
-        'valMoney.DataContext = New MarketResultsForMainWindow
     End Sub
 
 End Class
